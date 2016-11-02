@@ -57,6 +57,9 @@
                 var removedNodes = mutation.removedNodes;
 
                 addedNodes.forEach(function(node) {
+                    if(node.nodeType == 3) {
+                        return;
+                    }
                     if(node.hasAttribute('data-telemetry')) {
                         node.onclick = handleEvent;
                         if(node.tagName === 'input') {
