@@ -36,7 +36,7 @@
     var bootstrapTelemetry = function() {
         // Get all elements with telemetry attribute
         var telemetryElements = document.querySelectorAll('[data-telemetry]');
-        if(elements.length === 0) {
+        if(telemetryElements.length === 0) {
             return;
         }
         // For element, attach an event handler
