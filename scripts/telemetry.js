@@ -19,8 +19,8 @@
                 element: evt.toElement.dataset.telemetryId
             });
         } else {
-            //Flush the stack
-            stack = [];
+            //Flush the queue
+            queue = [];
         }
         console.log(evt);
     };
