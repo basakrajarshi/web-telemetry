@@ -53,8 +53,20 @@
         // Add event handlers for added DOM nodes
         var observer = new MutationObserver(function(mutations){
             mutations.forEach(function(mutation) {
-                console.log(mutation);
-                console.log('mutation');
+                var addedNodes = mutation.addedNodes;
+                var removedNodes = mutation.removedNodes;
+
+                addedNodes.forEach(function(node) {
+                    node.onclick = handleEvent;
+                    if(node.tagName === 'input') {
+                        node.onkeypress = handleEvent;
+                    }
+                });
+
+                removedNodes.forEach(function(node) {
+                    node.onclick = null;
+                    node.keypress = null;
+                });
             });
         });
 
@@ -64,7 +76,7 @@
         	characterData: true
         };
 
-        observer.observe(document.body, observerConfig);        
+        observer.observe(document.body, observerConfig);
     };
 
     bootstrapTelemetry();
