@@ -1,6 +1,11 @@
-(function() {
+var telemetry = (function() {
 
     var queue = [];
+    var _backendURL = '';
+
+    var setBackendURL = function(url) {
+        _backendURL = url;
+    }
 
     var getTimestamp = function() {
         return Date();
@@ -83,5 +88,9 @@
 
     // document.onclick = handleEvent;
     // document.onkeypress = handleEvent;
+
+    return {
+        setBackendURL: setBackendURL
+    };
 
 })();
