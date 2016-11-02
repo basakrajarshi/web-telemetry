@@ -49,6 +49,8 @@
         });
     };
 
+    bootstrapTelemetry();
+
     // document.onclick = handleEvent;
     // document.onkeypress = handleEvent;
 
