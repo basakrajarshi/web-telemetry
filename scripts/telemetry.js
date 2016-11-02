@@ -1,13 +1,6 @@
 (function() {
 
-    var stack = [];
-
-    var getDOMPath = function(domPath) {
-        // traverse the array in reverse
-        // for(var i = domPath.length - 1; i >= 0; i--) {
-        // }
-        return '';
-    };
+    var queue = [];
 
     var getTimestamp = function() {
         return Date();
@@ -17,14 +10,13 @@
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
-        var domPath = getDOMPath(evt.path);
-        if(stack.length < 10) {
-            stack.push({
+        if(queue.length < 10) {
+            queue.push({
                 type: evt.type,
                 os: os,
                 userAgent: userAgent,
                 timestamp: timestamp,
-                domPath: domPath
+                element: evt.toElement.dataset.telemetryId
             });
         } else {
             //Flush the stack
@@ -35,7 +27,7 @@
 
     var bootstrapTelemetry = function() {
         // Get all elements with telemetry attribute
-        var telemetryElements = document.querySelectorAll('[data-telemetry]');
+        var telemetryElements = document.querySelectorAll('[data-telemetry-id]');
         if(telemetryElements.length === 0) {
             return;
         }
@@ -60,7 +52,7 @@
                     if(node.nodeType == 3) {
                         return;
                     }
-                    if(node.hasAttribute('data-telemetry')) {
+                    if(node.hasAttribute('data-telemetry-id')) {
                         node.onclick = handleEvent;
                         if(node.tagName === 'input') {
                             node.onkeypress = handleEvent;
@@ -69,7 +61,7 @@
                 });
 
                 removedNodes.forEach(function(node) {
-                    if(node.hasAttribute('data-telemetry')) {
+                    if(node.hasAttribute('data-telemetry-id')) {
                         node.removeEventListener('click', handleEvent);
                         node.removeEventListener('keypress', handleEvent);
                     }
