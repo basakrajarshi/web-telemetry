@@ -47,6 +47,24 @@
                 element.keypress = handleEvent;
             }
         });
+
+        // Handle DOM change events
+        // Remove event handlers for removed DOM nodes
+        // Add event handlers for added DOM nodes
+        var observer = new MutationObserver(function(mutations){
+            mutations.forEach(function(mutation) {
+                console.log(mutation);
+                console.log('mutation');
+            });
+        });
+
+        var observerConfig = {
+        	attributes: true,
+        	childList: true,
+        	characterData: true
+        };
+
+        observer.observe(document.body, observerConfig);        
     };
 
     bootstrapTelemetry();
