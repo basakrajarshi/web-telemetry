@@ -57,15 +57,19 @@
                 var removedNodes = mutation.removedNodes;
 
                 addedNodes.forEach(function(node) {
-                    node.onclick = handleEvent;
-                    if(node.tagName === 'input') {
-                        node.onkeypress = handleEvent;
+                    if(node.hasAttribute('data-telemetry')) {
+                        node.onclick = handleEvent;
+                        if(node.tagName === 'input') {
+                            node.onkeypress = handleEvent;
+                        }
                     }
                 });
 
                 removedNodes.forEach(function(node) {
-                    node.onclick = null;
-                    node.keypress = null;
+                    if(node.hasAttribute('data-telemetry')) {
+                        node.removeEventListener('click', handleEvent);
+                        node.removeEventListener('keypress', handleEvent);
+                    }
                 });
             });
         });
@@ -73,7 +77,8 @@
         var observerConfig = {
         	attributes: true,
         	childList: true,
-        	characterData: true
+        	characterData: true,
+            subtree: true
         };
 
         observer.observe(document.body, observerConfig);
