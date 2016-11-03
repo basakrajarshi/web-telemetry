@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 from django.db import models
 
 EVENT_CHOICES = (
-    ('CLICK', 'click'),
-    ('KEYPRESS', 'keypress')
+    ('click', 'click'),
+    ('keypress', 'keypress'),
 )
 
 class TelemetryItem(models.Model):
@@ -11,3 +11,4 @@ class TelemetryItem(models.Model):
     os = models.CharField(max_length=30, blank=False)
     user_agent = models.CharField(max_length=150, blank=False)
     timestamp = models.DateField(blank=False)
+    element = models.CharField(max_length=50, blank=False)

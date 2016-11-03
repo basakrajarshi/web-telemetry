@@ -29,7 +29,10 @@ var telemetry = (function() {
         }
         httpRequest.onreadystatechange = _makeRequest;
         httpRequest.open('POST', _backendURL);
-        httpRequest.send();
+        var data = {
+            telemetry: queue;
+        };
+        httpRequest.send(JSON.stringify(data));
     };
 
     var handleEvent = function(evt) {
