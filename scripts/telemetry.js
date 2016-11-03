@@ -2,6 +2,7 @@ var telemetry = (function() {
 
     var queue = [];
     var _backendURL = '';
+    var httpRequest = new XMLHttpRequest();
 
     var setBackendURL = function(url) {
         _backendURL = url;
@@ -9,6 +10,26 @@ var telemetry = (function() {
 
     var getTimestamp = function() {
         return Date();
+    };
+
+    var _makeRequest = function() {
+        if(httpRequest.readyState === XMLHttpRequest.DONE) {
+            if(httpRequest.status === 200) {
+                queue = [];
+            }
+        } else {
+            console.log('Error processing request');
+        }
+    };
+
+    var transmitDataToBackend = function() {
+        if(!httpRequest) {
+            console.log('Could not create XMLHTTP instance');
+            return false;
+        }
+        httpRequest.onreadystatechange = _makeRequest;
+        httpRequest.open('POST', _backendURL);
+        httpRequest.send();
     };
 
     var handleEvent = function(evt) {
@@ -25,7 +46,7 @@ var telemetry = (function() {
             });
         } else {
             //Flush the queue
-            queue = [];
+            transmitDataToBackend();
         }
         console.log(evt);
     };
