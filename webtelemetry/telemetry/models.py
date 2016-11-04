@@ -10,5 +10,5 @@ class TelemetryItem(models.Model):
     event_type = models.CharField(choices=EVENT_CHOICES, blank=False, max_length=10)
     os = models.CharField(max_length=30, blank=False)
     user_agent = models.CharField(max_length=150, blank=False)
-    timestamp = models.DateField(blank=False)
+    timestamp = models.DateTimeField(blank=False)
     element = models.CharField(max_length=50, blank=False)
