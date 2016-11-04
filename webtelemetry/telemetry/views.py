@@ -3,7 +3,9 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.core.exceptions import ValidationError
+
 import json
+from datetime import datetime
 
 from models import TelemetryItem
 from exceptions import InvalidTelemetryDataException
@@ -23,11 +25,17 @@ def insert_telemetry_data_view(request):
         # for each telemetry item
         # construct the model object
         for item in telemetry_data:
+
+            # parse datetime
+            if not item['timestamp']:
+                raise InvalidTelemetryDataException('No/Invalid timestamp specified')
+            timestamp = datetime.strptime(item['timestamp'], '%m/%d/%Y, %I:%M:%S %p')
+
             telemetry_item = TelemetryItem(
                 event_type=item['type'],
                 os=item['os'],
                 user_agent=item['userAgent'],
-                timestamp=item['timestamp'],
+                timestamp=timestamp,
                 element=item['element']
             )
             try:

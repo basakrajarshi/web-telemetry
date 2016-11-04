@@ -9,7 +9,7 @@ var telemetry = (function() {
     }
 
     var getTimestamp = function() {
-        return Date();
+        return new Date().toLocaleString();
     };
 
     var _makeRequest = function() {
@@ -109,9 +109,6 @@ var telemetry = (function() {
     };
 
     bootstrapTelemetry();
-
-    // document.onclick = handleEvent;
-    // document.onkeypress = handleEvent;
 
     return {
         setBackendURL: setBackendURL
