@@ -7,6 +7,7 @@ var telemetry = (function() {
     var setBackendURL = function(url) {
         _backendURL = url;
     }
+    var _queueing = false;
 
     var getTimestamp = function() {
         return new Date().toLocaleString();
@@ -39,7 +40,20 @@ var telemetry = (function() {
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
-        if(queue.length < 10) {
+        if(_isQueing) {
+            if(queue.length < 10) {
+                queue.push({
+                    type: evt.type,
+                    os: os,
+                    userAgent: userAgent,
+                    timestamp: timestamp,
+                    element: evt.toElement.dataset.telemetryId
+                });
+            } else {
+                //Flush the queue
+                transmitDataToBackend();
+            }
+        } else {
             queue.push({
                 type: evt.type,
                 os: os,
@@ -47,10 +61,9 @@ var telemetry = (function() {
                 timestamp: timestamp,
                 element: evt.toElement.dataset.telemetryId
             });
-        } else {
-            //Flush the queue
             transmitDataToBackend();
         }
+
         console.log(evt);
     };
 
@@ -112,6 +125,7 @@ var telemetry = (function() {
 
     return {
         setBackendURL: setBackendURL
+        isQueueing: _isQueing
     };
 
 })();
