@@ -124,7 +124,7 @@ var telemetry = (function() {
     bootstrapTelemetry();
 
     return {
-        setBackendURL: setBackendURL
+        setBackendURL: setBackendURL,
         isQueueing: _isQueing
     };
 
