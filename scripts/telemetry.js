@@ -30,7 +30,7 @@ var telemetry = (function() {
         httpRequest.onreadystatechange = _makeRequest;
         httpRequest.open('POST', _backendURL);
         var data = {
-            telemetry: queue;
+            telemetry: queue
         };
         httpRequest.send(JSON.stringify(data));
     };
