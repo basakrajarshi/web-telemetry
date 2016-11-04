@@ -7,7 +7,7 @@ var telemetry = (function() {
     var setBackendURL = function(url) {
         _backendURL = url;
     }
-    var _queueing = false;
+    var _isQueing = false;
 
     var getTimestamp = function() {
         return new Date().toLocaleString();
