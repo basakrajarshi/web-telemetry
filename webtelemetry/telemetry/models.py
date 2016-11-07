@@ -12,3 +12,4 @@ class TelemetryItem(models.Model):
     user_agent = models.CharField(max_length=150, blank=False)
     timestamp = models.DateTimeField(blank=False)
     element = models.CharField(max_length=50, blank=False)
+    location = models.CharField(max_length=100, blank=False)
