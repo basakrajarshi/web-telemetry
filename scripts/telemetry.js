@@ -8,6 +8,8 @@ var telemetry = (function() {
         _backendURL = url;
     }
     var _isQueing = false;
+	var _sessionURL;
+	var _isSessionSet = false;
 
     var getTimestamp = function() {
         return new Date().toLocaleString();
@@ -36,6 +38,30 @@ var telemetry = (function() {
         httpRequest.send(JSON.stringify(data));
     };
 
+	var _sessionSet = function() {
+		if(httpRequest.readyState === XMLHttpRequest.DONE) {
+			if(httpRequest.status === 200) {
+				_isSessionSet = true;
+			}
+		}
+	};
+
+	var _setSession = function() {
+		if(!httpRequest) {
+			console.log('Could not create XMLHTTP instance');
+			return false;
+		}
+		httpRequest.onreadystatechange = _sessionSet;
+		httpRequest.open('POST', _sessionURL);
+		httpRequest.send(null);
+	};
+
+	var _getCookie = function getCookie(name) {
+			var value = "; " + document.cookie;
+			var parts = value.split("; " + name + "=");
+			if (parts.length == 2) return parts.pop().split(";").shift();
+	};
+
     var handleEvent = function(evt) {
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
@@ -51,7 +77,16 @@ var telemetry = (function() {
                 });
             } else {
                 //Flush the queue
-                transmitDataToBackend();
+				if(isSessionSet) {
+					transmitDataToBackend();
+				} else {
+					var waitTillSessionSet = setInterval(function(){
+						if(isSessionSet) {
+							clearInterval(waitTillSessionSet);
+							transmitDataToBackend();
+						}
+					}, 500);
+				}
             }
         } else {
             queue.push({
@@ -61,13 +96,24 @@ var telemetry = (function() {
                 timestamp: timestamp,
                 element: evt.toElement.dataset.telemetryId
             });
-            transmitDataToBackend();
+			if(isSessionSet) {
+				transmitDataToBackend();
+			} else {
+				var waitTillSessionSet = setInterval(function(){
+					if(isSessionSet) {
+						clearInterval(waitTillSessionSet);
+						transmitDataToBackend();
+					}
+				}, 500);
+			}
         }
-
-        console.log(evt);
     };
 
     var bootstrapTelemetry = function() {
+		// Manage Session
+		if(!_getCookie('telemetry_session')) {
+			_setSession();
+		}
         // Get all elements with telemetry attribute
         var telemetryElements = document.querySelectorAll('[data-telemetry-id]');
         if(telemetryElements.length === 0) {
@@ -125,7 +171,8 @@ var telemetry = (function() {
 
     return {
         setBackendURL: setBackendURL,
-        isQueueing: _isQueing
+        isQueueing: _isQueing,
+		setSessionURL: _sessionURL
     };
 
 })();
