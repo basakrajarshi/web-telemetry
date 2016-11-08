@@ -6,10 +6,13 @@ from django.core.exceptions import ValidationError
 
 import json
 from datetime import datetime
+from uuid import uuid4
 
 from models import TelemetryItem
 from exceptions import InvalidTelemetryDataException
 
+def _create_telemetry_session():
+    return uuid4().hex
 
 @require_http_methods(['POST'])
 @csrf_exempt
@@ -47,3 +50,17 @@ def insert_telemetry_data_view(request):
                 }, status=400)
             telemetry_item.save()
         return JsonResponse({})
+
+@require_http_methods(['POST'])
+@csrf_exempt
+def check_session(request):
+    session_cookie = request.session.get('telemetry_session', None)
+    # if session cookie exists, return blank JSON Response
+    if session_cookie:
+        return HttpResponse(json.dumps({}))
+    # create a session
+    # set a cookie that expires in 10 minutes
+    request.session.set_expiry(600)
+    request.session['telemetry_session'] = __create_telemetry_session()
+    return HttpResponse({})
+
