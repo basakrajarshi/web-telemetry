@@ -53,7 +53,7 @@ var telemetry = (function() {
 		httpRequest.send(null);
 	};
 
-	var _getCookie = function getCookie(name) {
+	var _getCookie = function (name) {
 			var value = "; " + document.cookie;
 			var parts = value.split("; " + name + "=");
 			if (parts.length == 2) return parts.pop().split(";").shift();
