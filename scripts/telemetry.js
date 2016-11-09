@@ -54,9 +54,9 @@ var telemetry = (function() {
 	};
 
 	var _getCookie = function (name) {
-			var value = "; " + document.cookie;
-			var parts = value.split("; " + name + "=");
-			if (parts.length == 2) return parts.pop().split(";").shift();
+		var value = "; " + document.cookie;
+		var parts = value.split("; " + name + "=");
+		if (parts.length == 2) return parts.pop().split(";").shift();
 	};
 
     var handleEvent = function(evt) {
@@ -126,9 +126,10 @@ var telemetry = (function() {
             throw 'No Backend URL and Session URL specified';
         }
 		// Manage Session
-		if(!_getCookie('telemetry_session')) {
-			_setSession();
-		}
+		// if(!_getCookie('telemetry_session')) {
+		// 	_setSession();
+		// }
+        _setSession();
         // Get all elements with telemetry attribute
         var telemetryElements = document.querySelectorAll('[data-telemetry-id]');
         if(telemetryElements.length === 0) {
