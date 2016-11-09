@@ -4,9 +4,6 @@ var telemetry = (function() {
     var _backendURL = '';
     var httpRequest = new XMLHttpRequest();
 
-    var setBackendURL = function(url) {
-        _backendURL = url;
-    }
     var _isQueing = false;
 	var _sessionURL;
 	var _isSessionSet = false;
@@ -110,7 +107,24 @@ var telemetry = (function() {
         }
     };
 
-    var bootstrapTelemetry = function() {
+    var bootstrapTelemetry = function(params) {
+        if(params) {
+            if(params.isQueueing && params.isQueueing === true) {
+                _isQueing = true;
+            }
+            if(params.backendURL && typeof params.backendURL === 'string') {
+                _backendURL = params.backendURL;
+            } else {
+                throw 'Backend URL not specified';
+            }
+            if(params.sessionURL && typeof params.sessionURL === 'string') {
+                _sessionURL = params.sessionURL;
+            } else {
+                throw 'Session URL not specified';
+            }
+        } else {
+            throw 'No Backend URL and Session URL specified';
+        }
 		// Manage Session
 		if(!_getCookie('telemetry_session')) {
 			_setSession();
@@ -168,12 +182,8 @@ var telemetry = (function() {
         observer.observe(document.body, observerConfig);
     };
 
-    bootstrapTelemetry();
-
     return {
-        setBackendURL: setBackendURL,
-        isQueueing: _isQueing,
-		setSessionURL: _sessionURL
+        bootstrapTelemetry: bootstrapTelemetry
     };
 
 })();
