@@ -61,6 +61,8 @@ def check_session(request):
     # create a session
     # set a cookie that expires in 10 minutes
     request.session.set_expiry(600)
-    request.session['telemetry_session'] = _create_telemetry_session()
+    telemetry_id = _create_telemetry_session()
+    request.session['telemetry_session'] = telemetry_id
+    response = HttpResponse()
+    response.set_cookie('telemetry_session', telemetry_id)
     return HttpResponse({})
-
