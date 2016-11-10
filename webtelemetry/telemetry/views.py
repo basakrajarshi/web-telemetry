@@ -57,12 +57,11 @@ def check_session(request):
     session_cookie = request.session.get('telemetry_session', None)
     # if session cookie exists, return blank JSON Response
     if session_cookie:
+        print 'cookie exists. returning'
         return HttpResponse(json.dumps({}))
     # create a session
     # set a cookie that expires in 10 minutes
     request.session.set_expiry(600)
     telemetry_id = _create_telemetry_session()
     request.session['telemetry_session'] = telemetry_id
-    response = HttpResponse()
-    response.set_cookie('telemetry_session', telemetry_id)
-    return HttpResponse({})
+    return HttpResponse(json.dumps({}))
