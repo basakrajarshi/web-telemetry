@@ -49,6 +49,7 @@ var telemetry = (function() {
 			return false;
 		}
 		httpRequest.onreadystatechange = _sessionSet;
+		httpRequest.withCredentials = true;
 		httpRequest.open('POST', _sessionURL);
 		httpRequest.send(null);
 	};
