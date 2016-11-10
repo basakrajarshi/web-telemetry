@@ -28,8 +28,23 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # CORS_URLS_REGEX = r'^telemetry/.*$'
-CORS_ORIGIN_ALLOW_ALL = True
-
+#CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+        'http://localhost:4000'
+)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = (
+        'Access-Control-Allow-Origin',
+        'accept',
+        'accept-encoding',
+        'authorization',
+        'content-type',
+        'dnt',
+        'origin',
+        'user-agent',
+        'x-csrftoken',
+        'x-requested-with',
+)
 # Application definition
 
 INSTALLED_APPS = [
