@@ -61,7 +61,7 @@ INSTALLED_APPS = [
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-SESSION_COOKIE_HTTPONLY = False
+#SESSION_COOKIE_HTTPONLY = False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
