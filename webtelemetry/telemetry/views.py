@@ -9,7 +9,7 @@ from datetime import datetime
 from uuid import uuid4
 
 from models import TelemetryItem
-from exceptions import InvalidTelemetryDataException
+from exceptions import InvalidSessionException, InvalidTelemetryDataException
 
 def _create_telemetry_session():
     return uuid4().hex
@@ -25,6 +25,11 @@ def insert_telemetry_data_view(request):
 
         telemetry_data = json.loads(telemetry_data)['telemetry']
 
+        # get the session information
+        telemetry_session_id = request.session.get('telemetry_session', None)
+        if not telemetry_session_id:
+            raise InvalidSessionException('Invalid Telemetry Session')
+
         # for each telemetry item
         # construct the model object
         for item in telemetry_data:
@@ -39,7 +44,8 @@ def insert_telemetry_data_view(request):
                 os=item['os'],
                 user_agent=item['userAgent'],
                 timestamp=timestamp,
-                element=item['element']
+                element=item['element'],
+                session_id=telemetry_session_id
             )
             try:
                 telemetry_item.full_clean()
@@ -60,8 +66,6 @@ def check_session(request):
         print 'cookie exists. returning'
         return HttpResponse(json.dumps({}))
     # create a session
-    # set a cookie that expires in 10 minutes
-    request.session.set_expiry(600)
     telemetry_id = _create_telemetry_session()
     request.session['telemetry_session'] = telemetry_id
     return HttpResponse(json.dumps({}))

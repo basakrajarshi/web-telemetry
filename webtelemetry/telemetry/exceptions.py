@@ -9,3 +9,11 @@ class InvalidTelemetryDataException(TelemetryDataException):
 
     def __str__(self):
         return self.message
+
+class InvalidSessionException(Exception):
+    """Telemetry Session is invalid"""
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
