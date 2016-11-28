@@ -13,3 +13,4 @@ class TelemetryItem(models.Model):
     timestamp = models.DateTimeField(blank=False)
     element = models.CharField(max_length=50, blank=False)
     location = models.CharField(max_length=100, blank=False)
+    session_id = models.CharField(max_length=32, blank=False)
