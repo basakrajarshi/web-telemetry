@@ -94,13 +94,14 @@ var telemetry = (function() {
                 os: os,
                 userAgent: userAgent,
                 timestamp: timestamp,
-                element: evt.toElement.dataset.telemetryId
+                element: evt.toElement.dataset.telemetryId,
+                location: window.location.pathname
             });
-			if(isSessionSet) {
+			if(_isSessionSet) {
 				transmitDataToBackend();
 			} else {
 				var waitTillSessionSet = setInterval(function(){
-					if(isSessionSet) {
+					if(_isSessionSet) {
 						clearInterval(waitTillSessionSet);
 						transmitDataToBackend();
 					}
