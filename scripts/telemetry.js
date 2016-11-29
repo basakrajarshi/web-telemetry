@@ -16,9 +16,9 @@ var telemetry = (function() {
         if(httpRequest.readyState === XMLHttpRequest.DONE) {
             if(httpRequest.status === 200) {
                 queue = [];
+            } else {
+                console.log('Error processing request');
             }
-        } else {
-            console.log('Error processing request');
         }
     };
 
@@ -104,6 +104,10 @@ var telemetry = (function() {
 					if(_isSessionSet) {
 						clearInterval(waitTillSessionSet);
 						transmitDataToBackend();
+                        // redirect
+                        if(evt.target.tagName === 'A') {
+                            window.location.href = evt.target.href;
+                        }
 					}
 				}, 500);
 			}

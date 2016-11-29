@@ -45,7 +45,8 @@ def insert_telemetry_data_view(request):
                 user_agent=item['userAgent'],
                 timestamp=timestamp,
                 element=item['element'],
-                session_id=telemetry_session_id
+                session_id=telemetry_session_id,
+                location=item['location']
             )
             try:
                 telemetry_item.full_clean()
