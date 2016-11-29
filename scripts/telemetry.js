@@ -79,11 +79,6 @@ var telemetry = (function() {
 						if(_isSessionSet) {
 							clearInterval(waitTillSessionSet);
 							transmitDataToBackend();
-
-                            // redirect
-                            if(evt.target.tagName === 'A') {
-                                window.location.href = evt.target.href;
-                            }
 						}
 					}, 500);
 				}
@@ -104,13 +99,11 @@ var telemetry = (function() {
 					if(_isSessionSet) {
 						clearInterval(waitTillSessionSet);
 						transmitDataToBackend();
-                        // redirect
-                        if(evt.target.tagName === 'A') {
-                            window.location.href = evt.target.href;
-                        }
-					}
 				}, 500);
 			}
+        }
+        if(evt.target.tagName === 'A') {
+            window.location.href = evt.target.href;
         }
         return true;
     };
