@@ -72,11 +72,11 @@ var telemetry = (function() {
                 });
             } else {
                 //Flush the queue
-				if(isSessionSet) {
+				if(_isSessionSet) {
 					transmitDataToBackend();
 				} else {
 					var waitTillSessionSet = setInterval(function(){
-						if(isSessionSet) {
+						if(_isSessionSet) {
 							clearInterval(waitTillSessionSet);
 							transmitDataToBackend();
 
