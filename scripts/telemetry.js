@@ -56,6 +56,7 @@ var telemetry = (function() {
 	};
 
     var handleEvent = function(evt) {
+        evt.preventDefault();
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
@@ -78,6 +79,11 @@ var telemetry = (function() {
 						if(isSessionSet) {
 							clearInterval(waitTillSessionSet);
 							transmitDataToBackend();
+
+                            // redirect
+                            if(evt.target.tagName === 'A') {
+                                window.location.href = evt.target.href;
+                            }
 						}
 					}, 500);
 				}
