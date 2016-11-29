@@ -51,7 +51,7 @@ var telemetry = (function() {
 		httpRequest.onreadystatechange = _sessionSet;
 		httpRequest.withCredentials = true;
 		httpRequest.open('POST', _sessionURL);
-		httpRequest.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:8000');
+		httpRequest.setRequestHeader('Access-Control-Allow-Origin', _sessionURL);
 		httpRequest.send(null);
 	};
 
@@ -101,6 +101,7 @@ var telemetry = (function() {
 				}, 500);
 			}
         }
+        return true;
     };
 
     var bootstrapTelemetry = function(params) {

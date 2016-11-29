@@ -30,7 +30,8 @@ ALLOWED_HOSTS = []
 # CORS_URLS_REGEX = r'^telemetry/.*$'
 #CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-        'http://localhost:4000'
+        'localhost:4000',
+        '127.0.0.1:4000'
 )
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = (
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 #SESSION_COOKIE_HTTPONLY = False
 
