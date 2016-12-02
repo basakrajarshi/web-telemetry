@@ -141,6 +141,10 @@ var telemetry = (function() {
         }
         // For element, attach an event handler
         telemetryElements.forEach(function(element) {
+            // Don't attach the click event for <a/> tags which are not self referentials
+            if(element.tagName === 'A' && !element.href.startsWith('#')) {
+                return;
+            }
             element.onclick = handleEvent;
             // if input element, attach a keypress event
             if(element.tagName === 'input') {
