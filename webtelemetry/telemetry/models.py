@@ -4,6 +4,7 @@ from django.db import models
 EVENT_CHOICES = (
     ('click', 'click'),
     ('keypress', 'keypress'),
+    ('navigation', 'navigation')
 )
 
 class TelemetryItem(models.Model):
@@ -13,4 +14,5 @@ class TelemetryItem(models.Model):
     timestamp = models.DateTimeField(blank=False)
     element = models.CharField(max_length=50, blank=False)
     location = models.CharField(max_length=100, blank=False)
+    new_location = models.CharField(max_length=100, blank=True)
     session_id = models.CharField(max_length=32, blank=False)

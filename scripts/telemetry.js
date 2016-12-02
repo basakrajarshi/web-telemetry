@@ -56,7 +56,7 @@ var telemetry = (function() {
 	};
 
     var handleEvent = function(evt) {
-        evt.preventDefault();
+        // evt.preventDefault();
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
@@ -108,10 +108,10 @@ var telemetry = (function() {
 				}, 500);
 			}
         }
-        if(evt.target.tagName === 'A') {
-            window.location.href = evt.target.href;
-        }
-        return true;
+        // if(evt.target.tagName === 'A') {
+        //     window.location.href = evt.target.href;
+        // }
+        // return true;
     };
 
     var bootstrapTelemetry = function(params) {
@@ -187,7 +187,31 @@ var telemetry = (function() {
         observer.observe(document.body, observerConfig);
 
         window.onbeforeunload = function(evt) {
-            console.log(evt);
+            // form object
+            var os = navigator.platform;
+            var userAgent = navigator.userAgent;
+            var timestamp = getTimestamp();
+            var telemetryObject = {
+                type: 'navigation',
+                os: os,
+                userAgent: userAgent,
+                timestamp: timestamp,
+                location: window.location.pathname,
+                newLocation: document.activeElement.pathname,
+                element: document.activeElement.attributes[0].value
+            };
+            console.log(telemetryObject);
+            // queue.push(telemetryObject);
+            // if(_isSessionSet) {
+			// 	transmitDataToBackend();
+			// } else {
+			// 	var waitTillSessionSet = setInterval(function(){
+			// 		if(_isSessionSet) {
+			// 			clearInterval(waitTillSessionSet);
+			// 			transmitDataToBackend();
+			// 		}
+			// 	}, 500);
+			// }
         };
 
     };
