@@ -185,6 +185,11 @@ var telemetry = (function() {
         };
 
         observer.observe(document.body, observerConfig);
+
+        window.onbeforeunload = function(evt) {
+            console.log(evt);
+        };
+
     };
 
     return {
