@@ -200,18 +200,18 @@ var telemetry = (function() {
                 newLocation: document.activeElement.pathname,
                 element: document.activeElement.attributes[0].value
             };
-            console.log(telemetryObject);
-            // queue.push(telemetryObject);
-            // if(_isSessionSet) {
-			// 	transmitDataToBackend();
-			// } else {
-			// 	var waitTillSessionSet = setInterval(function(){
-			// 		if(_isSessionSet) {
-			// 			clearInterval(waitTillSessionSet);
-			// 			transmitDataToBackend();
-			// 		}
-			// 	}, 500);
-			// }
+            // console.log(telemetryObject);
+            queue.push(telemetryObject);
+            if(_isSessionSet) {
+				transmitDataToBackend();
+			} else {
+				var waitTillSessionSet = setInterval(function(){
+					if(_isSessionSet) {
+						clearInterval(waitTillSessionSet);
+						transmitDataToBackend();
+					}
+				}, 500);
+			}
         };
 
     };

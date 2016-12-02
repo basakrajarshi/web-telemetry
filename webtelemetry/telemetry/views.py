@@ -39,6 +39,10 @@ def insert_telemetry_data_view(request):
                 raise InvalidTelemetryDataException('No/Invalid timestamp specified')
             timestamp = datetime.strptime(item['timestamp'], '%m/%d/%Y, %I:%M:%S %p')
 
+            # get new location if preset
+            new_location = item.get('newLocation', '')
+
+
             telemetry_item = TelemetryItem(
                 event_type=item['type'],
                 os=item['os'],
@@ -46,7 +50,8 @@ def insert_telemetry_data_view(request):
                 timestamp=timestamp,
                 element=item['element'],
                 session_id=telemetry_session_id,
-                location=item['location']
+                location=item['location'],
+                new_location=new_location
             )
             try:
                 telemetry_item.full_clean()
