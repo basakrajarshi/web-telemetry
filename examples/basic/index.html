@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Webtelemetry Example</title>
+        <script type="text/javascript" src="https://rawgit.com/ResearchComputing/web-telemetry/master/scripts/telemetry.js">
+        </script>
+        <script type="text/javascript">
+        function easingTimeout(delay, fn) {
+          var id,
+          invoker = function() {
+            fn();
+            delay *= 2
+            if (delay) {
+              id = setTimeout(invoker, delay);
+            } else {
+              id = null;
+            }
+          }
+
+          // start it off
+          id = setTimeout(invoker, delay);
+
+          return {
+              clear: function() {
+                  console.log('clearing ' + id);
+                  if (id) {
+                      clearTimeout(id);
+                      id = null;
+                  }
+              }
+            }
+        }
+
+        timeout = easingTimeout(500, function() {
+            if(typeof telemetry !== 'undefined') {
+                telemetry.bootstrapTelemetry({
+                     backendURL: 'http://127.0.0.1:8000/telemetry/insert/',
+                     sessionURL: 'http://127.0.0.1:8000/telemetry/checksession/'
+                 });
+                 timeout.clear();
+            }
+        });
+
+        </script>
+    </head>
+    <body>
+        <button type="button" name="button" data-telemetry-id="btn-1">Button 1</button>
+        <button type="button" name="button" data-telemetry-id="btn-2">Button 2</button>
+    </body>
+</html>
