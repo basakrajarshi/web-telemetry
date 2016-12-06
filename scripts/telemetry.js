@@ -107,7 +107,7 @@ var telemetry = (function() {
     };
 
     var handleScrollEvent = function(evt) {
-        event.stopPropagation();
+        evt.stopPropagation();
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
