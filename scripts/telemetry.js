@@ -80,11 +80,10 @@ var telemetry = (function() {
 						if(_isSessionSet) {
 							clearInterval(waitTillSessionSet);
 							transmitDataToBackend();
-
-                            // redirect
-                            if(evt.target.tagName === 'A') {
-                                window.location.href = evt.target.href;
-                            }
+                            // // redirect
+                            // if(evt.target.tagName === 'A') {
+                            //     window.location.href = evt.target.href;
+                            // }
 						}
 					}, 500);
 				}
@@ -150,6 +149,8 @@ var telemetry = (function() {
             // if input element, attach a keypress event
             if(element.tagName === 'input') {
                 element.keypress = handleEvent;
+                element.onfocus = handleEvent;
+                element.onblur = handleEvent;
             }
             element.onscroll = function() {
                 console.log('scrolling');
