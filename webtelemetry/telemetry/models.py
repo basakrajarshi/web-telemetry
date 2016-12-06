@@ -4,7 +4,10 @@ from django.db import models
 EVENT_CHOICES = (
     ('click', 'click'),
     ('keypress', 'keypress'),
-    ('navigation', 'navigation')
+    ('navigation', 'navigation'),
+    ('scrollend', 'scrollend'),
+    ('focus', 'focus'),
+    ('blur', 'blur'),
 )
 
 class TelemetryItem(models.Model):

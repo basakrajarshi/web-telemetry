@@ -57,6 +57,7 @@ var telemetry = (function() {
 
     var handleEvent = function(evt) {
         // evt.preventDefault();
+        event.stopPropagation();
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
