@@ -80,10 +80,6 @@ var telemetry = (function() {
 						if(_isSessionSet) {
 							clearInterval(waitTillSessionSet);
 							transmitDataToBackend();
-                            // // redirect
-                            // if(evt.target.tagName === 'A') {
-                            //     window.location.href = evt.target.href;
-                            // }
 						}
 					}, 500);
 				}
@@ -108,10 +104,56 @@ var telemetry = (function() {
 				}, 500);
 			}
         }
-        // if(evt.target.tagName === 'A') {
-        //     window.location.href = evt.target.href;
-        // }
-        // return true;
+    };
+
+    var handleScrollEvent = function(evt) {
+        event.stopPropagation();
+        var os = navigator.platform;
+        var userAgent = navigator.userAgent;
+        var timestamp = getTimestamp();
+        if(_isQueing) {
+            if(queue.length < 10) {
+                queue.push({
+                    type: 'scrollend',
+                    os: os,
+                    userAgent: userAgent,
+                    timestamp: timestamp,
+                    element: evt.toElement.dataset.telemetryId,
+                    location: window.location.pathname
+                });
+            } else {
+                //Flush the queue
+				if(_isSessionSet) {
+					transmitDataToBackend();
+				} else {
+					var waitTillSessionSet = setInterval(function(){
+						if(_isSessionSet) {
+							clearInterval(waitTillSessionSet);
+							transmitDataToBackend();
+						}
+					}, 500);
+				}
+            }
+        } else {
+            queue.push({
+                type: 'scrollend',
+                os: os,
+                userAgent: userAgent,
+                timestamp: timestamp,
+                element: evt.toElement.dataset.telemetryId,
+                location: window.location.pathname
+            });
+			if(_isSessionSet) {
+				transmitDataToBackend();
+			} else {
+				var waitTillSessionSet = setInterval(function(){
+					if(_isSessionSet) {
+						clearInterval(waitTillSessionSet);
+						transmitDataToBackend();
+					}
+				}, 500);
+			}
+        }
     };
 
     var bootstrapTelemetry = function(params) {
@@ -152,13 +194,14 @@ var telemetry = (function() {
                 element.onfocus = handleEvent;
                 element.onblur = handleEvent;
             }
-            element.onscroll = function() {
+            element.onscroll = function(evt) {
                 console.log('scrolling');
                 if(element.attributes.timeout) {
                     clearTimeout(element.attributes.timeout);
                 }
                 element.attributes.timeout = setTimeout(function(){
                     console.log('scrolling stopped');
+                    handleScrollEvent(evt);
                 }, 250);
             };
         });
@@ -177,13 +220,14 @@ var telemetry = (function() {
                     }
                     if(node.hasAttribute('data-telemetry-id')) {
                         node.onclick = handleEvent;
-                        node.onscroll = function() {
+                        node.onscroll = function(evt) {
                             console.log('scrolling');
                             if(node.attributes.timeout) {
                                 clearTimeout(node.attributes.timeout);
                             }
                             node.attributes.timeout = setTimeout(function(){
                                 console.log('scrolling stopped');
+                                handleScrollEvent(evt);
                             }, 250);
                         };
                         if(node.tagName === 'input') {
