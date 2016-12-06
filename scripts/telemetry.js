@@ -150,6 +150,15 @@ var telemetry = (function() {
             if(element.tagName === 'input') {
                 element.keypress = handleEvent;
             }
+            element.onscroll = function() {
+                console.log('scrolling');
+                if(element.attributes.timeout) {
+                    clearTimeout(element.attributes.timeout);
+                }
+                element.attributes.timeout = setTimeout(function(){
+                    console.log('scrolling stopped');
+                }, 250);
+            };
         });
 
         // Handle DOM change events
@@ -166,6 +175,15 @@ var telemetry = (function() {
                     }
                     if(node.hasAttribute('data-telemetry-id')) {
                         node.onclick = handleEvent;
+                        node.onscroll = function() {
+                            console.log('scrolling');
+                            if(node.attributes.timeout) {
+                                clearTimeout(node.attributes.timeout);
+                            }
+                            node.attributes.timeout = setTimeout(function(){
+                                console.log('scrolling stopped');
+                            }, 250);
+                        };
                         if(node.tagName === 'input') {
                             node.onkeypress = handleEvent;
                         }
