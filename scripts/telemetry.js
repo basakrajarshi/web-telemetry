@@ -49,8 +49,8 @@ var telemetry = (function() {
 			return false;
 		}
 		httpRequest.onreadystatechange = _sessionSet;
-		httpRequest.withCredentials = true;
 		httpRequest.open('POST', _sessionURL);
+        httpRequest.withCredentials = true;
 		httpRequest.setRequestHeader('Access-Control-Allow-Origin', _sessionURL);
 		httpRequest.send(null);
 	};
