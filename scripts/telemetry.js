@@ -236,12 +236,12 @@ var telemetry = (function() {
                     }
                 });
 
-                removedNodes.forEach(function(node) {
-                    if(node.hasAttribute('data-telemetry-id')) {
-                        node.removeEventListener('click', handleEvent);
-                        node.removeEventListener('keypress', handleEvent);
-                    }
-                });
+                // removedNodes.forEach(function(node) {
+                //     if(node.hasAttribute('data-telemetry-id')) {
+                //         node.removeEventListener('click', handleEvent);
+                //         node.removeEventListener('keypress', handleEvent);
+                //     }
+                // });
             });
         });
 
