@@ -61,6 +61,14 @@ var telemetry = (function() {
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
+        // If the element has it's own data-telemetry-id, use it
+        if(evt.toElement.hasAttribute('data-telemetry-id')) {
+            element = evt.toElement.dataset.telemetryId;
+        } else {
+            // Find the closest parent which has a data-telemetry-id
+            // This element would cause the event
+            element = evt.toElement.closest('[data-telemetry-id]').attributes['data-telemetry-id'].value;
+        }
         if(_isQueing) {
             if(queue.length < 10) {
                 queue.push({
@@ -68,7 +76,7 @@ var telemetry = (function() {
                     os: os,
                     userAgent: userAgent,
                     timestamp: timestamp,
-                    element: evt.toElement.dataset.telemetryId,
+                    element: element,
                     location: window.location.pathname
                 });
             } else {
@@ -90,7 +98,7 @@ var telemetry = (function() {
                 os: os,
                 userAgent: userAgent,
                 timestamp: timestamp,
-                element: evt.toElement.dataset.telemetryId,
+                element: element,
                 location: window.location.pathname
             });
 			if(_isSessionSet) {
@@ -111,6 +119,15 @@ var telemetry = (function() {
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
+        var element = null;
+        // If the element has it's own data-telemetry-id, use it
+        if(evt.srcElement.hasAttribute('data-telemetry-id')) {
+            element = evt.srcElement.dataset.telemetryId;
+        } else {
+            // Find the closest parent which has a data-telemetry-id
+            // This element would cause the event
+            element = evt.toElement.closest('[data-telemetry-id]').attributes['data-telemetry-id'].value;
+        }
         if(_isQueing) {
             if(queue.length < 10) {
                 queue.push({
@@ -118,7 +135,7 @@ var telemetry = (function() {
                     os: os,
                     userAgent: userAgent,
                     timestamp: timestamp,
-                    element: evt.srcElement.dataset.telemetryId,
+                    element: element,
                     location: window.location.pathname
                 });
             } else {
@@ -140,7 +157,7 @@ var telemetry = (function() {
                 os: os,
                 userAgent: userAgent,
                 timestamp: timestamp,
-                element: evt.srcElement.dataset.telemetryId,
+                element: element,
                 location: window.location.pathname
             });
 			if(_isSessionSet) {
@@ -218,7 +235,7 @@ var telemetry = (function() {
                     if(node.nodeType == 3) {
                         return;
                     }
-                    if(node.hasAttribute('data-telemetry-id')) {
+                    if(node.nodeType === 1 && node.hasAttribute('data-telemetry-id')) {
                         node.onclick = handleEvent;
                         node.onscroll = function(evt) {
                             console.log('scrolling');
@@ -237,7 +254,7 @@ var telemetry = (function() {
                 });
 
                 removedNodes.forEach(function(node) {
-                    if(node.hasAttribute('data-telemetry-id')) {
+                    if(node.nodeType === 1 && node.hasAttribute('data-telemetry-id')) {
                         node.removeEventListener('click', handleEvent);
                         node.removeEventListener('keypress', handleEvent);
                     }
