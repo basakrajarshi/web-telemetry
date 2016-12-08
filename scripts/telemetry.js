@@ -111,6 +111,15 @@ var telemetry = (function() {
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
+        var element = null;
+        // If the element has it's own data-telemetry-id, use it
+        if(evt.srcElement.hasAttribute('data-telemetry-id')) {
+            element = evt.srcElement.dataset.telemetryId;
+        } else {
+            // Find the closest parent which has a data-telemetry-id
+            // This element would cause the event
+            element = evt.toElement.closest('[data-telemetry-id]').attributes['data-telemetry-id'].value;
+        }
         if(_isQueing) {
             if(queue.length < 10) {
                 queue.push({
@@ -118,7 +127,7 @@ var telemetry = (function() {
                     os: os,
                     userAgent: userAgent,
                     timestamp: timestamp,
-                    element: evt.srcElement.dataset.telemetryId,
+                    element: element,
                     location: window.location.pathname
                 });
             } else {
@@ -140,7 +149,7 @@ var telemetry = (function() {
                 os: os,
                 userAgent: userAgent,
                 timestamp: timestamp,
-                element: evt.srcElement.dataset.telemetryId,
+                element: element,
                 location: window.location.pathname
             });
 			if(_isSessionSet) {
