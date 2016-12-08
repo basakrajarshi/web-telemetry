@@ -218,7 +218,7 @@ var telemetry = (function() {
                     if(node.nodeType == 3) {
                         return;
                     }
-                    if(node.hasAttribute('data-telemetry-id')) {
+                    if(node.nodeType === 1 && node.hasAttribute('data-telemetry-id')) {
                         node.onclick = handleEvent;
                         node.onscroll = function(evt) {
                             console.log('scrolling');
@@ -236,12 +236,12 @@ var telemetry = (function() {
                     }
                 });
 
-                // removedNodes.forEach(function(node) {
-                //     if(node.hasAttribute('data-telemetry-id')) {
-                //         node.removeEventListener('click', handleEvent);
-                //         node.removeEventListener('keypress', handleEvent);
-                //     }
-                // });
+                removedNodes.forEach(function(node) {
+                    if(node.nodeType === 1 && node.hasAttribute('data-telemetry-id')) {
+                        node.removeEventListener('click', handleEvent);
+                        node.removeEventListener('keypress', handleEvent);
+                    }
+                });
             });
         });
 
