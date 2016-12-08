@@ -76,7 +76,7 @@ var telemetry = (function() {
                     os: os,
                     userAgent: userAgent,
                     timestamp: timestamp,
-                    element: evt.toElement.dataset.telemetryId,
+                    element: element,
                     location: window.location.pathname
                 });
             } else {
@@ -98,7 +98,7 @@ var telemetry = (function() {
                 os: os,
                 userAgent: userAgent,
                 timestamp: timestamp,
-                element: evt.toElement.dataset.telemetryId,
+                element: element,
                 location: window.location.pathname
             });
 			if(_isSessionSet) {
