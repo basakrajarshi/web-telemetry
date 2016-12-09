@@ -173,6 +173,56 @@ var telemetry = (function() {
         }
     };
 
+    var handleErrors = function(message, source, lineNo, colNo, error) {
+        var os = navigator.platform;
+        var userAgent = navigator.userAgent;
+        var timestamp = getTimestamp();
+        var element = null;
+        if(_isQueing) {
+            if(queue.length < 10) {
+                queue.push({
+                    type: 'error',
+                    os: os,
+                    userAgent: userAgent,
+                    timestamp: timestamp,
+                    location: window.location.pathname,
+                    errorMessage: error.toString()
+                });
+            } else {
+                //Flush the queue
+				if(_isSessionSet) {
+					transmitDataToBackend();
+				} else {
+					var waitTillSessionSet = setInterval(function(){
+						if(_isSessionSet) {
+							clearInterval(waitTillSessionSet);
+							transmitDataToBackend();
+						}
+					}, 500);
+				}
+            }
+        } else {
+            queue.push({
+                type: 'error',
+                os: os,
+                userAgent: userAgent,
+                timestamp: timestamp,
+                location: window.location.pathname,
+                errorMessage: error.toString()
+            });
+			if(_isSessionSet) {
+				transmitDataToBackend();
+			} else {
+				var waitTillSessionSet = setInterval(function(){
+					if(_isSessionSet) {
+						clearInterval(waitTillSessionSet);
+						transmitDataToBackend();
+					}
+				}, 500);
+			}
+        }
+    };
+
     var bootstrapTelemetry = function(params) {
         if(params) {
             if(params.isQueueing && params.isQueueing === true) {
@@ -193,6 +243,7 @@ var telemetry = (function() {
         }
 		// Manage Session
         _setSession();
+        window.onerror = handleErrors;
         // Get all elements with telemetry attribute
         var telemetryElements = document.querySelectorAll('[data-telemetry-id]');
         if(telemetryElements.length === 0) {
