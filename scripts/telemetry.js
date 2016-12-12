@@ -69,49 +69,18 @@ var telemetry = (function() {
             // This element would cause the event
             element = evt.toElement.closest('[data-telemetry-id]').attributes['data-telemetry-id'].value;
         }
-        if(_isQueing) {
-            if(queue.length < 10) {
-                queue.push({
-                    type: evt.type,
-                    os: os,
-                    userAgent: userAgent,
-                    timestamp: timestamp,
-                    element: element,
-                    location: window.location.pathname
-                });
-            } else {
-                //Flush the queue
-				if(_isSessionSet) {
-					transmitDataToBackend();
-				} else {
-					var waitTillSessionSet = setInterval(function(){
-						if(_isSessionSet) {
-							clearInterval(waitTillSessionSet);
-							transmitDataToBackend();
-						}
-					}, 500);
-				}
-            }
-        } else {
-            queue.push({
-                type: evt.type,
-                os: os,
-                userAgent: userAgent,
-                timestamp: timestamp,
-                element: element,
-                location: window.location.pathname
-            });
-			if(_isSessionSet) {
-				transmitDataToBackend();
-			} else {
-				var waitTillSessionSet = setInterval(function(){
-					if(_isSessionSet) {
-						clearInterval(waitTillSessionSet);
-						transmitDataToBackend();
-					}
-				}, 500);
-			}
-        }
+
+        var data = {
+            type: evt.type,
+            os: os,
+            userAgent: userAgent,
+            timestamp: timestamp,
+            element: element,
+            location: window.location.pathname
+        };
+
+        _transmitData(data);
+
     };
 
     var handleScrollEvent = function(evt) {
@@ -128,48 +97,43 @@ var telemetry = (function() {
             // This element would cause the event
             element = evt.toElement.closest('[data-telemetry-id]').attributes['data-telemetry-id'].value;
         }
+
+        var data = {
+            type: 'scrollend',
+            os: os,
+            userAgent: userAgent,
+            timestamp: timestamp,
+            element: element,
+            location: window.location.pathname
+        };
+
+        _transmitData(data);
+
+    };
+
+    var _transmitData = function(data) {
         if(_isQueing) {
             if(queue.length < 10) {
-                queue.push({
-                    type: 'scrollend',
-                    os: os,
-                    userAgent: userAgent,
-                    timestamp: timestamp,
-                    element: element,
-                    location: window.location.pathname
-                });
+                queue.push(data);
             } else {
-                //Flush the queue
-				if(_isSessionSet) {
-					transmitDataToBackend();
-				} else {
-					var waitTillSessionSet = setInterval(function(){
-						if(_isSessionSet) {
-							clearInterval(waitTillSessionSet);
-							transmitDataToBackend();
-						}
-					}, 500);
-				}
+                _transmitIfSessionIsSet();
             }
         } else {
-            queue.push({
-                type: 'scrollend',
-                os: os,
-                userAgent: userAgent,
-                timestamp: timestamp,
-                element: element,
-                location: window.location.pathname
-            });
-			if(_isSessionSet) {
-				transmitDataToBackend();
-			} else {
-				var waitTillSessionSet = setInterval(function(){
-					if(_isSessionSet) {
-						clearInterval(waitTillSessionSet);
-						transmitDataToBackend();
-					}
-				}, 500);
-			}
+            queue.push(data);
+            _transmitIfSessionIsSet();
+        }
+    };
+
+    var _transmitIfSessionIsSet = function() {
+        if(_isSessionSet) {
+            transmitDataToBackend();
+        } else {
+            var waitTillSessionSet = setInterval(function(){
+                if(_isSessionSet) {
+                    clearInterval(waitTillSessionSet);
+                    transmitDataToBackend();
+                }
+            }, 500);
         }
     };
 
@@ -178,53 +142,19 @@ var telemetry = (function() {
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
         var element = source;
-        if(_isQueing) {
-            if(queue.length < 10) {
-                queue.push({
-                    type: 'error',
-                    os: os,
-                    userAgent: userAgent,
-                    element: element,
-                    lineNo: lineNo,
-                    timestamp: timestamp,
-                    location: window.location.pathname,
-                    errorMessage: error.toString()
-                });
-            } else {
-                //Flush the queue
-				if(_isSessionSet) {
-					transmitDataToBackend();
-				} else {
-					var waitTillSessionSet = setInterval(function(){
-						if(_isSessionSet) {
-							clearInterval(waitTillSessionSet);
-							transmitDataToBackend();
-						}
-					}, 500);
-				}
-            }
-        } else {
-            queue.push({
-                type: 'error',
-                os: os,
-                userAgent: userAgent,
-                element: element,
-                lineNo: lineNo,
-                timestamp: timestamp,
-                location: window.location.pathname,
-                errorMessage: error.toString()
-            });
-			if(_isSessionSet) {
-				transmitDataToBackend();
-			} else {
-				var waitTillSessionSet = setInterval(function(){
-					if(_isSessionSet) {
-						clearInterval(waitTillSessionSet);
-						transmitDataToBackend();
-					}
-				}, 500);
-			}
-        }
+
+        var data = {
+            type: 'error',
+            os: os,
+            userAgent: userAgent,
+            lineNo: lineNo,
+            timestamp: timestamp,
+            location: window.location.pathname,
+            errorMessage: error.toString()
+        };
+
+        _transmitData(data);
+
     };
 
     var bootstrapTelemetry = function(params) {
