@@ -39,19 +39,25 @@ def insert_telemetry_data_view(request):
                 raise InvalidTelemetryDataException('No/Invalid timestamp specified')
             timestamp = datetime.strptime(item['timestamp'], '%m/%d/%Y, %I:%M:%S %p')
 
-            # get new location if preset
+            # get new location if present
             new_location = item.get('newLocation', '')
 
+            # get error message if present
+            error_message = item.get('errorMessage', '')
+
+            # get element if present
+            element = item.get('element', '')
 
             telemetry_item = TelemetryItem(
                 event_type=item['type'],
                 os=item['os'],
                 user_agent=item['userAgent'],
                 timestamp=timestamp,
-                element=item['element'],
+                element=element,
                 session_id=telemetry_session_id,
                 location=item['location'],
-                new_location=new_location
+                new_location=new_location,
+                error_message=error_message
             )
             try:
                 telemetry_item.full_clean()
@@ -69,7 +75,6 @@ def check_session(request):
     session_cookie = request.session.get('telemetry_session', None)
     # if session cookie exists, return blank JSON Response
     if session_cookie:
-        print 'cookie exists. returning'
         return HttpResponse(json.dumps({}))
     # create a session
     telemetry_id = _create_telemetry_session()
