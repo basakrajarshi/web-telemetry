@@ -147,6 +147,7 @@ var telemetry = (function() {
             type: 'error',
             os: os,
             userAgent: userAgent,
+            element: element,
             lineNo: lineNo,
             timestamp: timestamp,
             location: window.location.pathname,
