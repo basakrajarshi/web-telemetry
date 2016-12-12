@@ -177,13 +177,15 @@ var telemetry = (function() {
         var os = navigator.platform;
         var userAgent = navigator.userAgent;
         var timestamp = getTimestamp();
-        var element = null;
+        var element = source;
         if(_isQueing) {
             if(queue.length < 10) {
                 queue.push({
                     type: 'error',
                     os: os,
                     userAgent: userAgent,
+                    element: element,
+                    lineNo: lineNo,
                     timestamp: timestamp,
                     location: window.location.pathname,
                     errorMessage: error.toString()
@@ -206,6 +208,8 @@ var telemetry = (function() {
                 type: 'error',
                 os: os,
                 userAgent: userAgent,
+                element: element,
+                lineNo: lineNo,
                 timestamp: timestamp,
                 location: window.location.pathname,
                 errorMessage: error.toString()

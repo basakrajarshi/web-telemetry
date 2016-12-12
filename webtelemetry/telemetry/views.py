@@ -45,6 +45,9 @@ def insert_telemetry_data_view(request):
             # get error message if present
             error_message = item.get('errorMessage', '')
 
+            # get error line no if present
+            error_line_no = item.get('lineNo', '')
+
             # get element if present
             element = item.get('element', '')
 
@@ -57,7 +60,8 @@ def insert_telemetry_data_view(request):
                 session_id=telemetry_session_id,
                 location=item['location'],
                 new_location=new_location,
-                error_message=error_message
+                error_message=error_message,
+                error_line_no=error_line_no
             )
             try:
                 telemetry_item.full_clean()

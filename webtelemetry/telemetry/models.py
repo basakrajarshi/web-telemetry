@@ -21,3 +21,4 @@ class TelemetryItem(models.Model):
     new_location = models.CharField(max_length=100, blank=True)
     session_id = models.CharField(max_length=32, blank=False)
     error_message = models.CharField(max_length=75, blank=True)
+    error_line_no = models.CharField(max_length=10, blank=True)

@@ -6,7 +6,18 @@ class TelemetryItemAdmin(admin.ModelAdmin):
     def view_timestamp(self, obj):
         return obj.timestamp.ctime()
 
-    list_display = ('id', 'event_type', 'os', 'view_timestamp', 'element', 'location', 'new_location', 'session_id', 'error_message')
+    list_display = (
+        'id',
+        'event_type',
+        'os',
+        'view_timestamp',
+        'element',
+        'location',
+        'new_location',
+        'session_id',
+        'error_message',
+        'error_line_no',
+    )
 
 
 admin.site.register(TelemetryItem, TelemetryItemAdmin)
