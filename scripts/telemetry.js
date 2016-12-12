@@ -273,16 +273,7 @@ var telemetry = (function() {
             };
             // console.log(telemetryObject);
             queue.push(telemetryObject);
-            if(_isSessionSet) {
-				transmitDataToBackend();
-			} else {
-				var waitTillSessionSet = setInterval(function(){
-					if(_isSessionSet) {
-						clearInterval(waitTillSessionSet);
-						transmitDataToBackend();
-					}
-				}, 500);
-			}
+            _transmitIfSessionIsSet();
         };
 
     };
