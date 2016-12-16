@@ -155,7 +155,7 @@ var telemetry = (function() {
         };
 
         _transmitData(data);
-
+        return false;
     };
 
     var bootstrapTelemetry = function(params) {
