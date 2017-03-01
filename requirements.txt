@@ -1,9 +1,13 @@
 appdirs==1.4.2
 backports-abc==0.5
 certifi==2017.1.23
+funcsigs==1.0.2
+mock==2.0.0
 packaging==16.8
+pbr==2.0.0
 pkg-resources==0.0.0
 pyparsing==2.1.10
+redis==2.10.5
 singledispatch==3.4.0.3
 six==1.10.0
 tornado==4.4.2
