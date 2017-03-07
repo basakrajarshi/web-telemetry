@@ -1,5 +1,5 @@
 from redis import StrictRedis
-from settings import REDIS_HOST, REDIS_PORT
+from webtelemetry import settings
 import tornado.web
 
 class RedisMixin(tornado.web.RequestHandler):
@@ -8,4 +8,4 @@ class RedisMixin(tornado.web.RequestHandler):
     """
 
     def initialize(self):
-        self.redis = StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+        self.redis = StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
