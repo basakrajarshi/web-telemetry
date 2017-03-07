@@ -5,7 +5,8 @@ import tornado.options
 import tornado.web
 import tornado.httpserver
 from handlers import SessionHandler, TelemetryHandler
-from settings import COOKIE_SECRET
+
+from webtelemetry import settings
 
 class TelemetryApplication(tornado.web.Application):
     def __init__(self):
@@ -15,7 +16,7 @@ class TelemetryApplication(tornado.web.Application):
         ]
 
         app_settings = dict(
-            cookie_secret=COOKIE_SECRET
+            cookie_secret=settings.COOKIE_SECRET
         )
 
         tornado.web.Application.__init__(self, handlers, **app_settings)
