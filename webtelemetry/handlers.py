@@ -1,31 +1,56 @@
 import tornado.web
 import tornado.websocket
+from tornado.escape import json_decode
 import uuid
 import json
 
-from mixins import RedisMixin
+from webtelemetry import settings
 
-class TelemetryHandler(tornado.websocket.WebSocketHandler):
-    def open(self):
-        print 'WebSocket opened'
-        #TODO if session id is valid, increment count
-        #TODO if session id is not valid, create a session
+from mixins import CorsMixin, LoggerMixin, RedisMixin
+
+class TelemetryEventWebsocket(tornado.websocket.WebSocketHandler, LoggerMixin):
+    def check_origin(self, origin):
+        return True
+
+    def get(self, *args, **kwargs):
+        sessionid = self.get_secure_cookie('sessionid')
+        if not sessionid:
+            self.set_status(403)
+            self.finish()
+        else:
+            super(TelemetryEventWebsocket, self).get(*args, **kwargs)
 
     def on_message(self, message):
-        self.write_message(message)
-
-    def on_close(self):
-        print 'WebSocket closed'
-        # TODO check for session id count
-        # TODO if session id count is 0, delete session cookie
+        json_message = json_decode(message)
+        json_message['ip'] = self.request.remote_ip
+        self.log_event(json_message)
+        self.write_message({})
 
 
-class SessionHandler(RedisMixin):
+class TelemetryEventHandler(CorsMixin, LoggerMixin):
+    def post(self):
+        # check auth cookie
+        sessionid = self.get_secure_cookie('sessionid')
+        if sessionid:
+            # get message
+            message = self.request.body
+            json_message = json_decode(message)
+            json_message['ip'] = self.request.remote_ip
+            json_message['sessionid'] = sessionid
+            self.log_event(json_message)
+            self.finish()
+        else:
+            self.set_status(403)
+            self.finish()
+
+
+class SessionHandler(CorsMixin, RedisMixin):
     """
     Checks if the session exists or not.
     If the session exists, increment the count in Redis
     Else, create and return a session
     """
+
     def get(self):
         # Handle session
         session_id = self.get_secure_cookie('sessionid')

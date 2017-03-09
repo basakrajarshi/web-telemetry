@@ -19,3 +19,5 @@ LOGGERS = {
         'config': {}
     }
 }
+
+CORS_ORIGIN = 'http://localhost:8888'

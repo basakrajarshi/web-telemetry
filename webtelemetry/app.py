@@ -4,15 +4,16 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import tornado.httpserver
-from handlers import SessionHandler, TelemetryHandler
+from handlers import SessionHandler, TelemetryEventHandler, TelemetryEventWebsocket
 
 from webtelemetry import settings
 
 class TelemetryApplication(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r'/telemetry/add/', TelemetryHandler),
+            (r'/telemetry/events/ws/', TelemetryEventWebsocket),
             (r'/session/', SessionHandler),
+            (r'/telemetry/events/', TelemetryEventHandler),
         ]
 
         app_settings = dict(
@@ -25,7 +26,7 @@ class TelemetryApplication(tornado.web.Application):
 
 def main():
     telemetry_application = TelemetryApplication()
-    port = os.environ.get('TELEMETRY_PORT', 8888)
+    port = os.environ.get('TELEMETRY_PORT', 8000)
     telemetry_application.listen(int(port))
     tornado.ioloop.IOLoop.instance().start()
 

@@ -1,6 +1,9 @@
 from app import TelemetryApplication
-from handlers import SessionHandler, TelemetryHandler
-from tornado.testing import AsyncHTTPTestCase
+from tornado.httpclient import HTTPRequest
+from tornado.testing import gen_test, AsyncHTTPTestCase
+from tornado.escape import json_decode, json_encode
+from tornado.websocket import websocket_connect
+from tornado.httpclient import HTTPError
 import json
 import mock
 
@@ -77,3 +80,92 @@ class TestSessionHandler(AsyncHTTPTestCase):
         )
         self.assertEqual(response.code, 400)
         self.assertEqual(json.loads(response.body)['text'], 'INVALID_OPERATION')
+
+
+class TelemetryAjaxHandlerTestCase(AsyncHTTPTestCase):
+    def get_app(self):
+        return TelemetryApplication()
+
+    @mock.patch('webtelemetry.loggers.ConsoleLogger.write')
+    @mock.patch('webtelemetry.loggers.JsonLogger.write')
+    @mock.patch(
+        'tornado.web.RequestHandler.get_secure_cookie',
+        return_value=MOCK_COOKIE
+    )
+    def test_broadcast_telemetry_event(
+        self, mock_console, mock_json, mock_cookie):
+        payload = {
+            "event": "click",
+            "user_ip": "10.0.0.1",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36\
+             (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
+        }
+        response = self.fetch(
+            '/telemetry/events/',
+            method='POST',
+            body=json_encode(payload)
+        )
+        self.assertEqual(response.code, 200)
+        mock_console.assert_called()
+        mock_json.assert_called()
+
+    @mock.patch(
+        'tornado.web.RequestHandler.get_secure_cookie',
+        return_value=None
+    )
+    def test_unauthorized_request(self, mock_cookie):
+        payload = {
+            "event": "click",
+            "user_ip": "10.0.0.1",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36\
+             (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
+        }
+        response = self.fetch(
+            '/telemetry/events/',
+            method='POST',
+            body=json_encode(payload)
+        )
+        self.assertEqual(response.code, 403)
+
+
+class TelemetryHandlerTestCase(AsyncHTTPTestCase):
+    def get_app(self):
+        return TelemetryApplication()
+
+
+    @mock.patch(
+        'tornado.websocket.WebSocketHandler.get_secure_cookie',
+        return_value=None)
+    @gen_test
+    def test_unauthorized_request(self, mock_cookie):
+        with self.assertRaises(HTTPError) as e:
+            client = yield websocket_connect(
+                'ws://localhost:{}/telemetry/events/ws/'.format(self.get_http_port()),
+                io_loop=self.io_loop
+            )
+
+
+    @mock.patch('webtelemetry.loggers.ConsoleLogger.write')
+    @mock.patch('webtelemetry.loggers.JsonLogger.write')
+    @mock.patch(
+        'tornado.websocket.WebSocketHandler.get_secure_cookie',
+        return_value=MOCK_COOKIE)
+    @gen_test
+    def test_broadcast_message(self, mock_console, mock_json, mock_cookie):
+        payload = {
+            "event": "click",
+            "user_ip": "10.0.0.1",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36\
+             (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
+        }
+
+        client = yield websocket_connect(
+            'ws://localhost:{}/telemetry/events/ws/'.format(self.get_http_port()),
+            io_loop=self.io_loop
+        )
+
+        client.write_message(json_encode(payload))
+        response = yield client.read_message()
+
+        mock_console.assert_called()
+        mock_json.assert_called()

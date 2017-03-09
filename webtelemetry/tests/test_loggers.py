@@ -31,7 +31,7 @@ class ConsoleLoggerTestCase(unittest.TestCase):
         out = StringIO()
         sys.stdout = out
 
-        logger = ConsoleLogger()
+        logger = ConsoleLogger(logger_name='ConsoleLogger')
         msg = {
             'event': 'click',
             'user_ip': '10.0.0.1',
@@ -61,4 +61,4 @@ class JsonLoggerTestCase(unittest.TestCase):
 
         with open(self.mock_json_file[1]) as test_json_output:
             output = test_json_output.read()
-            self.assertEqual(output, json.dumps(msg))
+            self.assertEqual(output, json.dumps(msg) + '\n')
