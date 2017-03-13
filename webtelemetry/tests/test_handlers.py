@@ -36,8 +36,12 @@ class TestSessionHandler(AsyncHTTPTestCase):
         self.assertEqual(response.code, 200)
         self.assertEqual(json.loads(response.body)['text'], 'SESSION_INCR')
 
-    @mock.patch('mixins.StrictRedis.get', return_value='2')
+    @mock.patch('mixins.StrictRedis')
     def test_decrement_session(self, mock_redis):
+
+        mock_redis_instance = mock_redis.return_value
+        mock_redis_instance.get.return_value = '2'
+
         # call delete
         response = self.fetch(
             '/session/',
@@ -47,8 +51,12 @@ class TestSessionHandler(AsyncHTTPTestCase):
         self.assertEqual(response.code, 200)
         self.assertEqual(json.loads(response.body)['text'], 'SESSION_DECR')
 
-    @mock.patch('mixins.StrictRedis.get', return_value='1')
+    @mock.patch('mixins.StrictRedis')
     def test_clear_cookie(self, mock_redis):
+
+        mock_redis_instance = mock_redis.return_value
+        mock_redis_instance.get.return_value = '1'
+
         response = self.fetch(
             '/session/',
             method='DELETE',
@@ -57,8 +65,12 @@ class TestSessionHandler(AsyncHTTPTestCase):
         self.assertEqual(response.code, 200)
         self.assertEqual(json.loads(response.body)['text'], 'SESSION_CLEAR')
 
-    @mock.patch('mixins.StrictRedis.get', return_value=None)
+    @mock.patch('mixins.StrictRedis')
     def test_invalid_operation(self, mock_redis):
+
+        mock_redis_instance = mock_redis.return_value
+        mock_redis_instance.get.return_value = None
+
         response = self.fetch(
             '/session/',
             method='DELETE'
