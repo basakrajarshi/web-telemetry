@@ -1,12 +1,49 @@
 var telemetry = (function() {
 
-    var queue = [];
     var _backendURL = '';
+    var _backendWebSocketURL = '';
     var httpRequest = new XMLHttpRequest();
-
-    var _isQueing = false;
+    var _fallback = false;
 	var _sessionURL;
 	var _isSessionSet = false;
+    var _ws = null;
+    var _captureKeys = false;
+    var _debug = false;
+
+    var _getWebSocketUrl = function(urlParams) {
+        var protocol = 'wss';
+        var port = '8080';
+        if(urlParams.protocol) {
+            protocol = urlParams.protocol;
+        }
+        if(urlParams.port) {
+            port = urlParams.port
+        }
+        return _formURL(protocol, port, urlParams);
+    };
+
+    var _getHTTPURL = function(urlParams) {
+        var protocol = 'http';
+        var port = '8080';
+        if(urlParams.protocol) {
+            protocol = urlParams.protocol;
+        }
+        if(urlParams.port) {
+            port = urlParams.port
+        }
+        return _formURL(protocol, port, urlParams);
+    };
+
+    var _formURL = function(protocol, port, urlParams) {
+
+        if(!urlParams.host) {
+            throw 'No Host specified';
+        }
+        if(!urlParams.prefix) {
+            throw 'No Session URL specified';
+        }
+        return `${protocol}://${urlParams.host}:${port}${urlParams.prefix}`;
+    }
 
     var getTimestamp = function() {
         return new Date().toLocaleString();
@@ -14,24 +51,36 @@ var telemetry = (function() {
 
     var _makeRequest = function() {
         if(httpRequest.readyState === XMLHttpRequest.DONE) {
-            if(httpRequest.status === 200) {
-                queue = [];
-            } else {
+            if(httpRequest.status !== 200) {
                 console.log('Error processing request');
             }
         }
     };
 
-    var transmitDataToBackend = function() {
+    var sendTelemetryEvent = function(data) {
+        if(!_ws) {
+            // create a websocket connection
+            _ws = new WebSocket(_backendWebSocketURL);
+            _ws.onopen = function() {
+                _ws.send(JSON.stringify(data));
+            }
+            if(_debug) {
+                _ws.onmessage = function(evt) {
+                    console.log(evt.data);
+                }
+            }
+        } else {
+            _ws.send(JSON.stringify(data));
+        }
+    };
+
+    var transmitDataToBackend = function(data) {
         if(!httpRequest) {
             console.log('Could not create XMLHTTP instance');
             return false;
         }
         httpRequest.onreadystatechange = _makeRequest;
         httpRequest.open('POST', _backendURL);
-        var data = {
-            telemetry: queue
-        };
         httpRequest.send(JSON.stringify(data));
     };
 
@@ -49,9 +98,9 @@ var telemetry = (function() {
 			return false;
 		}
 		httpRequest.onreadystatechange = _sessionSet;
-		httpRequest.open('POST', _sessionURL);
+		httpRequest.open('GET', _sessionURL);
         httpRequest.withCredentials = true;
-		httpRequest.setRequestHeader('Access-Control-Allow-Origin', _sessionURL);
+		httpRequest.setRequestHeader('Access-Control-Allow-Origin', window.location.origin);
 		httpRequest.send(null);
 	};
 
@@ -78,6 +127,10 @@ var telemetry = (function() {
             element: element,
             location: window.location.pathname
         };
+
+        if(evt.type === 'keypress' && _captureKeys) {
+            data.telemetryItem.keyCode = evt.keyCode;
+        }
 
         _transmitData(data);
 
@@ -112,26 +165,19 @@ var telemetry = (function() {
     };
 
     var _transmitData = function(data) {
-        if(_isQueing) {
-            if(queue.length < 10) {
-                queue.push(data);
-            } else {
-                _transmitIfSessionIsSet();
-            }
+        var transmit;
+        if(_fallback) {
+            transmit = transmitDataToBackend;
         } else {
-            queue.push(data);
-            _transmitIfSessionIsSet();
+            transmit = sendTelemetryEvent;
         }
-    };
-
-    var _transmitIfSessionIsSet = function() {
         if(_isSessionSet) {
-            transmitDataToBackend();
+            transmit(data);
         } else {
             var waitTillSessionSet = setInterval(function(){
                 if(_isSessionSet) {
                     clearInterval(waitTillSessionSet);
-                    transmitDataToBackend();
+                    transmit(data);
                 }
             }, 500);
         }
@@ -160,22 +206,38 @@ var telemetry = (function() {
 
     var bootstrapTelemetry = function(params) {
         if(params) {
-            if(params.isQueueing && params.isQueueing === true) {
-                _isQueing = true;
-            }
-            if(params.backendURL && typeof params.backendURL === 'string') {
-                _backendURL = params.backendURL;
-            } else {
-                throw 'Backend URL not specified';
-            }
-            if(params.sessionURL && typeof params.sessionURL === 'string') {
-                _sessionURL = params.sessionURL;
+            if(params.sessionURL && typeof params.sessionURL === 'object') {
+                _sessionURL = _getHTTPURL(params.sessionURL);
             } else {
                 throw 'Session URL not specified';
+            }
+            if(params.captureKeys) {
+                _captureKeys = true;
+            }
+            if(params.debug) {
+                _debug = true;
+            }
+            if(window.WebSocket) {
+                // Websocket supported
+                if(params.backendWebSocketURL && typeof params.backendWebSocketURL === 'object') {
+                    _backendWebSocketURL = _getWebSocketUrl(params.backendWebSocketURL);
+                } else {
+                    throw 'Web Socket handler URL not specified';
+                }
+            } else {
+                // No support for websockets
+                // Fallback to AJAX
+                _fallback = true;
+                if(params.backendURL && typeof params.backendURL === 'object') {
+                    _backendURL = _getHTTPURL(params.backendURL);
+                } else {
+                    throw 'No Backend URL specified';
+                }
             }
         } else {
             throw 'No Backend URL and Session URL specified';
         }
+
 		// Manage Session
         _setSession();
         window.onerror = handleErrors;
@@ -198,12 +260,10 @@ var telemetry = (function() {
                 element.onblur = handleEvent;
             }
             element.onscroll = function(evt) {
-                console.log('scrolling');
                 if(element.attributes.timeout) {
                     clearTimeout(element.attributes.timeout);
                 }
                 element.attributes.timeout = setTimeout(function(){
-                    console.log('scrolling stopped');
                     handleScrollEvent(evt);
                 }, 250);
             };
@@ -224,12 +284,10 @@ var telemetry = (function() {
                     if(node.nodeType === 1 && node.hasAttribute('data-telemetry-id')) {
                         node.onclick = handleEvent;
                         node.onscroll = function(evt) {
-                            console.log('scrolling');
                             if(node.attributes.timeout) {
                                 clearTimeout(node.attributes.timeout);
                             }
                             node.attributes.timeout = setTimeout(function(){
-                                console.log('scrolling stopped');
                                 handleScrollEvent(evt);
                             }, 250);
                         };
@@ -271,11 +329,20 @@ var telemetry = (function() {
                 newLocation: document.activeElement.pathname,
                 element: document.activeElement.attributes[0].value
             };
-            // console.log(telemetryObject);
-            queue.push(telemetryObject);
-            _transmitIfSessionIsSet();
+            _transmitData(telemetryObject);
+            _deleteSession();
         };
 
+    };
+
+    var deleteSession = function() {
+        if(!httpRequest) {
+            console.log('Could not create XMLHttpRequest');
+            return false;
+        }
+        httpRequest.onreadystatechange = _makeRequest;
+        httpRequest.open('DELETE', _sessionURL);
+        httpRequest.send();
     };
 
     return {
